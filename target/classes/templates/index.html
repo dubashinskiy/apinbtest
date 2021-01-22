@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../static/css/bootstrap.css" th:href="@{/css/bootstrap.css}"/>
+    <script src="../static/js/bootstrap.js" th:src="@{/js/bootstrap.js}"></script>
+    <script src="../static/js/jQuery.js" th:src="@{/js/jQuery.js}"></script>
+    <script src="../static/js/jquery-3.3.1.min.js" th:src="@{/js/jquery-3.3.1.min.js}"></script>
+    <script src="../static/js/highcharts.js" th:src="@{/js/highcharts.js}"></script>
+    <script src="../static/js/exporting.js" th:src="@{/js/exporting.js}"></script>
+    <script src="../static/js/export-data.js" th:src="@{/js/export-data.js}"></script>
+    <script type="text/javascript" src="../static/js/moment-with-locales.min.js"
+            th:src="@{/js/moment-with-locales.min.js}"></script>
+    <script type="text/javascript" src="../static/js/bootstrap.min.js" th:src="@{/js/bootstrap.min.js}"></script>
+    <script type="text/javascript" src="../static/js/bootstrap-datepicker.min.js"
+            th:src="@{/js/bootstrap-datepicker.min.js}"></script>
+    <script src="../static/js/bootstrap-datepicker.ru.min.js" charset="UTF-8"
+            th:src="@{/js/bootstrap-datepicker.ru.min.js}"></script>
+
+    <title>Title</title>
+</head>
+<body>
+<form action="/index" th:action="@{/index}" method="post">
+    <div class="container-fluid">
+        <div class="row m-3">
+            <div class="col-sm text-end">
+                <label>Валюта</label>
+            </div>
+            <div class="col-sm">
+                <select name="currency" class="border-2 border-primary" style="width: 25%">
+                    <option th:each="currency:${list}" th:value="${currency.Cur_ID}"
+                            th:text="${currency.Cur_Name}"></option>
+                </select>
+            </div>
+        </div>
+        <div class="row m-3">
+            <div class="col-sm text-end">
+                <label>Дата от</label>
+            </div>
+            <div class="col-sm">
+                <input type="date" name="dateStart" class="border-2 border-primary" style="width: 25%">
+            </div>
+        </div>
+        <div class="row m-3">
+            <div class="col-sm text-end">
+                <label>Дата до</label>
+            </div>
+            <div class="col-sm">
+                <input type="date" name="dateEnd" class="border-2 border-primary" style="width: 25%"></div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm text-center">
+            <button type="submit" class="btn btn-info">Выполнить</button>
+        </div>
+    </div>
+    <div class="row">
+        <div th:if="${ #lists.isEmpty(currencyList)}" class="col-sm text-center">
+            <h3 class="text-center"><b>Укажите валюту и даты</b></h3>
+        </div>
+    </div>
+    <div th:if="${not #lists.isEmpty(currencyList)}">
+        <div id="container" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+    </div>
+</form>
+
+<script src="../static/js/main.js" th:src="@{/js/main.js}"></script>
+
+
+
+
+<script th:inline="javascript">
+
+    var currencyList = [[${currencyList}]];
+
+    var series = [];
+
+    for(var i = 0; i < currencyList.length; i++){
+
+        var  rate = currencyList[i];
+
+        var dateObj = new Date(rate.Date);
+        var month = ('0' + (dateObj.getMonth() + 1)).slice(-2);
+        var date = ('0' + dateObj.getDate()).slice(-2);
+        var year = dateObj.getFullYear();
+        var shortDate = date + '/' + month + '/' + year;
+
+        series.push([shortDate, rate.Cur_OfficialRate]);
+
+    }
+
+    Highcharts.chart('container', {
+        chart: {
+            type: 'areaspline'
+        },
+        title: {
+            text: 'График'
+        },
+        legend: {
+            layout: 'vertical',
+            align: 'left',
+            verticalAlign: 'top',
+            x: 1000,
+            y: -5,
+            floating: true,
+            borderWidth: 1,
+            backgroundColor:
+                Highcharts.defaultOptions.legend.backgroundColor || '#FFFFFF'
+        },
+        xAxis: {
+            plotBands: [{
+                from: 4.5,
+                to: 6.5,
+                 color: 'rgba(68, 170, 213, .2)'
+            }]
+        },
+        yAxis: {
+            title: {
+                text: ''
+            }
+        },
+        tooltip: {
+            shared: true,
+            valueSuffix: ' '
+        },
+        credits: {
+            enabled: false
+        },
+        plotOptions: {
+            areaspline: {
+                fillOpacity: 0.5
+            }
+        },
+        series: [{
+            name: 'Белоруский рубль',
+            data: series
+        },]
+    });
+
+
+</script>
+
+</body>
+</html>
